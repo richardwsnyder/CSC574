@@ -116,7 +116,7 @@ def server_thread(conn, addr):
             ret = get_permissions(pub_key).encode()
         end = time.time()
         output = open('results.txt', 'a')
-        output.write('Time it took to do {}: {}'.format(decoded_encrypted_data, end - begin))
+        output.write('Time it took to do {}: {}\n'.format(decoded_encrypted_data, end - begin))
         # send back return message
         conn.send(ret)
 

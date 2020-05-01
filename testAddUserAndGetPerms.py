@@ -37,7 +37,7 @@ def addUserThread(msg, session_key, nonce, tag, pub_key):
 
 pub_keys = []
 
-for i in range(10):
+for i in range(100):
     # change the RSA key size per implementation
     key = RSA.generate(1024)
 
@@ -88,7 +88,7 @@ def getPermissionsThread(msg, session_key, nonce, tag, pub_key):
         data = c.recv(1024)
         print('Received', repr(data))
 
-for i in range(10):
+for i in range(100):
     public_key = pub_keys[i]
 
     # msg that will be sent to the server
