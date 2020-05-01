@@ -33,13 +33,13 @@ def addUserThread(msg, session_key, nonce, tag, pub_key):
         data_string = pickle.dumps(arr)
         c.send(data_string)
         data = c.recv(1024)
-        print('Received', repr(data))
+        # print('Received', repr(data))
 
 pub_keys = []
 
 for i in range(100):
     # change the RSA key size per implementation
-    key = RSA.generate(1024)
+    key = RSA.generate(2048)
 
     # write the private key
     private_key = key.export_key()
@@ -86,7 +86,7 @@ def getPermissionsThread(msg, session_key, nonce, tag, pub_key):
         data_string = pickle.dumps(arr)
         c.send(data_string)
         data = c.recv(1024)
-        print('Received', repr(data))
+        # print('Received', repr(data))
 
 for i in range(100):
     public_key = pub_keys[i]

@@ -10,7 +10,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
 
 # change the RSA key size per implementation
-key = RSA.generate(1024)
+key = RSA.generate(2048)
 
 # write the private key
 private_key = key.export_key()
@@ -85,7 +85,7 @@ def server_thread(conn, addr):
     # logging.info('Connection with addr %s: starting', addr)
     with conn:
         # receive msg, session key, nonce, and tag
-        data = conn.recv(2048)
+        data = conn.recv(4096)
         ret = ''
         if not data:
             ret = 'Did not properly send data'.encode()
