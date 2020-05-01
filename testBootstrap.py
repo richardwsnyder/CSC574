@@ -11,7 +11,7 @@ from Crypto.Cipher import AES, PKCS1_OAEP
 
 
 
-HOST = '192.168.0.105'
+HOST = '127.0.0.1'
 PORT = 65432
 
 format = '%(asctime)s: %(message)s'
