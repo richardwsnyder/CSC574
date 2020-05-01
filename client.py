@@ -17,18 +17,70 @@ format = '%(asctime)s: %(message)s'
 logging.basicConfig(format=format, level=logging.INFO, datefmt='%H:%M:%S')
 
 def client_thread(msg, session_key, nonce, tag, thread_num):
+    # change the RSA key size per implementation
+    key = RSA.generate(1024)
+
+    # write the private key
+    private_key = key.export_key()
+    file_out = open('client-private-{}.pem'.format(thread_num), 'wb')
+    file_out.write(private_key)
+    file_out.close()
+
+    # write the public key
+    public_key = key.publickey().export_key()
+    file_out = open('client-receiver-{}.pem'.format(thread_num), 'wb')
+    file_out.write(public_key)
+    file_out.close()
     # logging.info('I am thread {}'.format(thread_num))
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as c:
         c.connect((HOST, PORT))
-        arr = (msg, session_key, nonce, tag)
+        arr = (msg, session_key, nonce, tag, public_key, 'common')
         data_string = pickle.dumps(arr)
         c.send(data_string)
         data = c.recv(1024)
         print('Received', repr(data))
 
+def bootstrap(msg, session_key, nonce, tag):
+    # change the RSA key size per implementation
+    key = RSA.generate(1024)
+
+    # write the private key
+    private_key = key.export_key()
+    file_out = open('client-private.pem', 'wb')
+    file_out.write(private_key)
+    file_out.close()
+
+    # write the public key
+    public_key = key.publickey().export_key()
+    file_out = open('client-receiver.pem', 'wb')
+    file_out.write(public_key)
+    file_out.close()
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as c:
+        c.connect((HOST, PORT))
+        arr = (msg, session_key, nonce, tag, public_key)
+        data_string = pickle.dumps(arr)
+        c.send(data_string)
+        data = c.recv(1024)
+        print('Received', repr(data))
+
+# get server public key and create session key
+recipient_key = RSA.importKey(open('server-receiver.pem').read())
+session_key = get_random_bytes(16)
+
+# encrypt the message
+cipher_aes = AES.new(session_key, AES.MODE_EAX)
+ciphertext, tag = cipher_aes.encrypt_and_digest('bootstrap'.encode('utf-8'))
+bootstrap(ciphertext, session_key, cipher_aes.nonce, tag)
+
+bootstrap(ciphertext, session_key, cipher_aes.nonce, tag)
+
+time.sleep(5)
+
+
 for i in range(10):
     # msg that will be sent to the server
-    msg = 'Hello world, I am number {}'.format(i).encode('utf-8')
+    msg = 'adduser'.encode('utf-8')
 
     # get server public key and create session key
     recipient_key = RSA.importKey(open('server-receiver.pem').read())
